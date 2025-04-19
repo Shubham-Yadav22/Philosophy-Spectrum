@@ -49,6 +49,7 @@ function App() {
   const [answers, setAnswers] = useState([]);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState("");
+  const [showIntro, setShowIntro] = useState(true);
 
   const handleAnswer = (category) => {
     const updatedAnswers = [...answers, category];
@@ -70,19 +71,43 @@ function App() {
     }
   };
 
+  const startQuiz = () => {
+    setShowIntro(false);
+  };
+
   const restartQuiz = () => {
     setCurrentQuestion(0);
     setAnswers([]);
     setShowResult(false);
     setResult("");
+    setShowIntro(true);
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-800 via-black to-gray-900 flex justify-center items-center p-6">
-      <div className="bg-white bg-opacity-90 max-w-xl w-full p-8 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-        <h1 className="text-3xl font-semibold mb-6 text-center text-gray-500">Philosophy Spectrum</h1>
+    <div className="quiz-container">
+      <div className="mirror-card">
+        <h1 className="quiz-title">Philosophy Spectrum</h1>
         <AnimatePresence mode="wait">
-          {!showResult ? (
+          {showIntro ? (
+            <motion.div
+              key="intro"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="intro-container"
+            >
+              <p className="intro-text">
+                These questions evaluate where you stand on the philosophical spectrum.
+              </p>
+              <button
+                onClick={startQuiz}
+                className="start-button"
+              >
+                Begin Quiz
+              </button>
+            </motion.div>
+          ) : !showResult ? (
             <motion.div
               key={currentQuestion}
               initial={{ opacity: 0, x: 100 }}
@@ -90,26 +115,26 @@ function App() {
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="w-full bg-gray-300 rounded-full h-2 mb-6">
+              <div className="progress-container">
                 <div
-                  className="bg-black h-2 rounded-full"
+                  className="progress-bar"
                   style={{
                     width: `${((currentQuestion + 1) / questions.length) * 100}%`
                   }}
                 ></div>
               </div>
-              <h2 className="text-2xl font-semibold mb-6 text-center text-gray-500">
-                Question {currentQuestion + 1}/{questions.length}
-              </h2>
-              <p className="text-lg text-gray-700 mb-8 text-center font-medium">
+              <div className="question-number">
+                Question {currentQuestion + 1} of {questions.length}
+              </div>
+              <p className="question-text">
                 {questions[currentQuestion].question}
               </p>
-              <div className="space-y-4">
+              <div className="options-container">
                 {questions[currentQuestion].options.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswer(option.category)}
-                    className="w-full bg-gray-500 hover:bg-gray-600 transition-all text-white font-semibold py-3 px-5 rounded-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="option-button"
                   >
                     {option.text}
                   </button>
@@ -123,21 +148,21 @@ function App() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-center space-y-4"
+              className="result-container"
             >
-              <h1 className="text-3xl font-semibold text-gray-500 mb-4">You are...</h1>
+              <h1 className="result-title">You are...</h1>
               <img
                 src={resultsDescription[result].image}
                 alt={resultsDescription[result].title}
-                className="w-full max-h-64 object-cover rounded-lg shadow-md mb-4"
+                className="result-image"
               />
-              <h2 className="text-xl font-semibold text-gray-700">{resultsDescription[result].title}</h2>
-              <p className="text-xl text-gray-500 mt-4 font-medium">
+              <h2 className="result-subtitle">{resultsDescription[result].title}</h2>
+              <p className="result-description">
                 {resultsDescription[result].description}
               </p>
               <button
                 onClick={restartQuiz}
-                className="mt-6 bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="restart-button"
               >
                 Retake Quiz
               </button>
